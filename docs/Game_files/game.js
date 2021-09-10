@@ -3057,13 +3057,13 @@ var Game;
         Engine.System.createEvent(Engine.EventType.TIME_UPDATE, "onDrawTextFront");
         Engine.System.createEvent(Engine.EventType.CLEAR_SCENE, "onClearScene");
         for (var i = 1; i <= Game.MAX_LEVELS; i += 1) {
-            Game.dataLevelsNormal[i] = Engine.Data.load("level.normal." + i) || "locked";
+            Game.dataLevelsNormal[i] = Engine.Data.load("level.normal." + i) || "unlocked";
         }
         if (Game.dataLevelsNormal[1] == "locked") {
             Game.dataLevelsNormal[1] = "unlocked";
         }
         for (var i = 1; i <= Game.MAX_LEVELS; i += 1) {
-            Game.dataLevelsHard[i] = Engine.Data.load("level.hard." + i) || "locked";
+            Game.dataLevelsHard[i] = Engine.Data.load("level.hard." + i) || "unlocked";
         }
         if (Game.dataLevelsHard[1] == "locked") {
             Game.dataLevelsHard[1] = "unlocked";
@@ -6106,12 +6106,12 @@ var Game;
             _this.start.control.onReleasedDelegate = _this.startReleased;
             _this.hard = new Game.TextButton();
             _this.hard.control.listener = _this;
-            _this.hard.control.enabled = Game.dataLevelsNormal[Game.MAX_LEVELS] == "cleared";
+            _this.hard.control.enabled = true; //Game.dataLevelsNormal[Game.MAX_LEVELS] == "cleared";
             _this.hard.text.font = Game.FontManager.a;
             _this.hard.text.scale = 1;
             _this.hard.text.enabled = true;
             _this.hard.text.pinned = true;
-            _this.hard.text.str = Game.dataLevelsNormal[Game.MAX_LEVELS] == "cleared" ? "INSANE MODE" : "?????? ????";
+            _this.hard.text.str = "INSANE MODE"; //Game.dataLevelsNormal[Game.MAX_LEVELS] == "cleared" ? "INSANE MODE" : "?????? ????";
             _this.hard.text.xAlignBounds = Utils.AnchorAlignment.MIDDLE;
             _this.hard.text.xAlignView = Utils.AnchorAlignment.MIDDLE;
             _this.hard.text.yAlignBounds = Utils.AnchorAlignment.MIDDLE;
