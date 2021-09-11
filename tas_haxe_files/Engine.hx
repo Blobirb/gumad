@@ -25,6 +25,8 @@ class Engine {
 	var frameLength:Float = 16.66666666; // 60 FPS
 	var fps:Float;
 
+	var resetLevelFrames = 19;
+
 	var control = new PlayControl();
 	var playback:Option<Video.VideoPlayer> = None; // If this is initialized, we're in playback.
 	var recording:Video.VideoRecorder = new Video.VideoRecorder(0);
@@ -288,6 +290,16 @@ class Engine {
 			return true;
 		}
 
+		// t to reset level, but stop on frame "minus one"
+		if (input == CoffeeInput.ResetShort) {
+			resetLevelFrames = 18;
+			playback = None;
+			resetLevel();
+			control.pause();
+			triggerPausedCallback();
+			return true;
+		}
+
 		// p to replay the video in slot 0 at normal speed
 		if (input == CoffeeInput.Replay) {
 			loadPlayback(slots[0]);
@@ -352,9 +364,10 @@ class Engine {
 		var advanceFrameInterval = Browser.window.setInterval(function(){
 			triggerPausedCallback();
 			count++;
-			if (count >= 19) {
+			if (count >= resetLevelFrames) {
 				// Stop the loop
 				untyped clearInterval(advanceFrameInterval);
+				resetLevelFrames = 19;
 			}
 		}, frameLength);
 	}

@@ -170,6 +170,7 @@ var Engine = function() {
 	this.recording = new VideoRecorder(0);
 	this.playback = haxe_ds_Option.None;
 	this.control = new PlayControl();
+	this.resetLevelFrames = 19;
 	this.frameLength = 16.66666666;
 	var _gthis = this;
 	this._requestAnimationFrame = ($_=window,$bind($_,$_.requestAnimationFrame));
@@ -234,7 +235,7 @@ Engine.prototype = {
 				if(_gthis.control.frame + 1 >= player.video.pauseFrame) {
 					if(_gthis.fullgameVideo == null) {
 						_gthis.control.pause();
-						console.log("tas_haxe_files/Engine.hx:106:","[PAUSE ] @ " + (_gthis.control.frame + 1));
+						console.log("tas_haxe_files/Engine.hx:108:","[PAUSE ] @ " + (_gthis.control.frame + 1));
 						_gthis.control.silent = false;
 					} else {
 						_gthis.control.frame = 0;
@@ -340,7 +341,7 @@ Engine.prototype = {
 		if(replay == null) {
 			replay = false;
 		}
-		console.log("tas_haxe_files/Engine.hx:219:","[" + (replay ? "REPLAY" : "RESET to") + " " + (slot == null ? "start" : "slot " + (slot == null ? "null" : "" + slot) + "...") + "]");
+		console.log("tas_haxe_files/Engine.hx:221:","[" + (replay ? "REPLAY" : "RESET to") + " " + (slot == null ? "start" : "slot " + (slot == null ? "null" : "" + slot) + "...") + "]");
 		this.sendGameInput(82,true);
 		var tmp = this.control.speed == 0 ? 100 : this.frameLength;
 		window.setTimeout(function() {
@@ -358,13 +359,13 @@ Engine.prototype = {
 	,handleInterfaceInput: function(input,ctrlKey,altKey) {
 		var oldControl = JSON.parse(JSON.stringify(this.control));
 		if(input == CoffeeInput.StepFrame && this.control.paused) {
-			console.log("tas_haxe_files/Engine.hx:247:","[STEP  ] @ " + (this.control.frame + 1));
+			console.log("tas_haxe_files/Engine.hx:249:","[STEP  ] @ " + (this.control.frame + 1));
 			this.triggerPausedCallback();
 			return true;
 		}
 		if(input == CoffeeInput.Pause) {
 			if(!oldControl.paused) {
-				console.log("tas_haxe_files/Engine.hx:255:","[PAUSE ] @ " + (this.control.frame + 1));
+				console.log("tas_haxe_files/Engine.hx:257:","[PAUSE ] @ " + (this.control.frame + 1));
 			}
 			this.control.pause();
 			return true;
@@ -386,12 +387,20 @@ Engine.prototype = {
 		if(playAction) {
 			this.control.paused = false;
 			if(oldControl.paused) {
-				console.log("tas_haxe_files/Engine.hx:276:","[PLAY  ] @ " + this.control.frame);
+				console.log("tas_haxe_files/Engine.hx:278:","[PLAY  ] @ " + this.control.frame);
 			}
 			this.triggerPausedCallback();
 			return true;
 		}
 		if(input == CoffeeInput.Reset) {
+			this.playback = haxe_ds_Option.None;
+			this.resetLevel();
+			this.control.pause();
+			this.triggerPausedCallback();
+			return true;
+		}
+		if(input == CoffeeInput.ResetShort) {
+			this.resetLevelFrames = 18;
 			this.playback = haxe_ds_Option.None;
 			this.resetLevel();
 			this.control.pause();
@@ -405,7 +414,7 @@ Engine.prototype = {
 			this.triggerPausedCallback();
 			return true;
 		}
-		if(input._hx_index == 7) {
+		if(input._hx_index == 8) {
 			var slot = input.code;
 			if(!ctrlKey) {
 				this.loadPlayback(this.slots[slot]);
@@ -421,8 +430,8 @@ Engine.prototype = {
 			if(ctrlKey && !altKey) {
 				this.control.pause();
 				var video = this.recording.saveVideo(this.control.frame);
-				console.log("tas_haxe_files/Engine.hx:319:","[SAVE slot " + slot + "] @ " + this.control.frame);
-				console.log("tas_haxe_files/Engine.hx:320:","data: " + video.toString());
+				console.log("tas_haxe_files/Engine.hx:331:","[SAVE slot " + slot + "] @ " + this.control.frame);
+				console.log("tas_haxe_files/Engine.hx:332:","data: " + video.toString());
 				this.slots[slot] = video;
 				return true;
 			}
@@ -430,7 +439,7 @@ Engine.prototype = {
 		return false;
 	}
 	,onScene: function(levelNum) {
-		console.log("tas_haxe_files/Engine.hx:334:","[SCENE " + levelNum + "]");
+		console.log("tas_haxe_files/Engine.hx:346:","[SCENE " + levelNum + "]");
 		if(this.fullgameVideo != null && this.fullgameVideo.length >= levelNum) {
 			this.fullgameLevelCounter = levelNum;
 			this.loadPlayback(this.fullgameVideo[this.fullgameLevelCounter - 1]);
@@ -446,8 +455,9 @@ Engine.prototype = {
 		var advanceFrameInterval = window.setInterval(function() {
 			_gthis.triggerPausedCallback();
 			count += 1;
-			if(count >= 19) {
+			if(count >= _gthis.resetLevelFrames) {
 				clearInterval(advanceFrameInterval);
+				_gthis.resetLevelFrames = 19;
 			}
 		},this.frameLength);
 	}
@@ -478,7 +488,7 @@ Engine.prototype = {
 		refreshLoop();
 	}
 };
-var CoffeeInput = $hxEnums["CoffeeInput"] = { __ename__ : true, __constructs__ : ["StepFrame","Pause","PlaySlow","PlayNormal","PlayFast","Replay","Reset","Slot"]
+var CoffeeInput = $hxEnums["CoffeeInput"] = { __ename__ : true, __constructs__ : ["StepFrame","Pause","PlaySlow","PlayNormal","PlayFast","Replay","Reset","ResetShort","Slot"]
 	,StepFrame: {_hx_index:0,__enum__:"CoffeeInput",toString:$estr}
 	,Pause: {_hx_index:1,__enum__:"CoffeeInput",toString:$estr}
 	,PlaySlow: {_hx_index:2,__enum__:"CoffeeInput",toString:$estr}
@@ -486,7 +496,8 @@ var CoffeeInput = $hxEnums["CoffeeInput"] = { __ename__ : true, __constructs__ :
 	,PlayFast: {_hx_index:4,__enum__:"CoffeeInput",toString:$estr}
 	,Replay: {_hx_index:5,__enum__:"CoffeeInput",toString:$estr}
 	,Reset: {_hx_index:6,__enum__:"CoffeeInput",toString:$estr}
-	,Slot: ($_=function(code) { return {_hx_index:7,code:code,__enum__:"CoffeeInput",toString:$estr}; },$_.__params__ = ["code"],$_)
+	,ResetShort: {_hx_index:7,__enum__:"CoffeeInput",toString:$estr}
+	,Slot: ($_=function(code) { return {_hx_index:8,code:code,__enum__:"CoffeeInput",toString:$estr}; },$_.__params__ = ["code"],$_)
 };
 var KeyBindings = function() { };
 KeyBindings.__name__ = true;
@@ -504,6 +515,8 @@ KeyBindings.fromKeyCode = function(code) {
 		return haxe_ds_Option.Some(CoffeeInput.Reset);
 	case 83:
 		return haxe_ds_Option.Some(CoffeeInput.PlaySlow);
+	case 84:
+		return haxe_ds_Option.Some(CoffeeInput.ResetShort);
 	case 90:
 		return haxe_ds_Option.Some(CoffeeInput.StepFrame);
 	default:
@@ -594,7 +607,8 @@ Main.infoTrace = function(str) {
 Main.main = function() {
 	console.log("tas_haxe_files/Main.hx:9:","  _____           _              _      _____       __  __          \r\n |_   _|         | |            | |    / ____|     / _|/ _|         \r\n   | |  _ __  ___| |_ __ _ _ __ | |_  | |     ___ | |_| |_ ___  ___ \r\n   | | | '_ \\/ __| __/ _` | '_ \\| __| | |    / _ \\|  _|  _/ _ \\/ _ \\\r\n  _| |_| | | \\__ \\ || (_| | | | | |_  | |___| (_) | | | ||  __/  __/\r\n |_____|_| |_|___/\\__\\__,_|_| |_|\\__|  \\_____\\___/|_| |_| \\___|\\___|");
 	console.log("tas_haxe_files/Main.hx:15:","Instant Coffee is enabled.");
-	Main.infoTrace("[r] to reset and pause.");
+	Main.infoTrace("[r] to reset, and pause on the first frame of the level.");
+	Main.infoTrace("[t] to reset, but pause one frame before the level begins. That way, you can pause the game on 'frame zero'.");
 	Main.infoTrace("[a-s-d-f] to adjust playback speed.");
 	Main.infoTrace("[z] to step frame.");
 	Main.infoTrace("[0-9] to reset and play back video in the respective slot (used for save states).");
