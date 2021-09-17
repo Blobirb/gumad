@@ -26,6 +26,7 @@ class Engine {
 	var fps:Float;
 
 	var resetLevelFrames = 19;
+	var resetLevelWithKeyR = false;
 
 	var control = new PlayControl();
 	var playback:Option<Video.VideoPlayer> = None; // If this is initialized, we're in playback.
@@ -52,6 +53,8 @@ class Engine {
 
 		untyped window.coffee._keyup = this.keyup;
 		untyped window.coffee._keydown = this.keydown;
+
+		untyped window.coffee.isLevelResetWithKeyR = function() { return resetLevelWithKeyR; }
 
 		// API for runners
 		untyped window.coffee.load = function(string:String, ?slot:Int) {
@@ -219,6 +222,8 @@ class Engine {
 		if (replay == null)
 			replay = false;
 		trace('[${replay ? "REPLAY" : "RESET to"} ${(slot == null) ? "start" : "slot " + Std.string(slot) + "..."}]');
+
+		resetLevelWithKeyR = true;
 		
 		// Press the "r" key to trigger in-game reset
 		sendGameInput(82, true);
@@ -290,16 +295,6 @@ class Engine {
 			return true;
 		}
 
-		// t to reset level, but stop on frame "minus one"
-		if (input == CoffeeInput.ResetShort) {
-			resetLevelFrames = 18;
-			playback = None;
-			resetLevel();
-			control.pause();
-			triggerPausedCallback();
-			return true;
-		}
-
 		// p to replay the video in slot 0 at normal speed
 		if (input == CoffeeInput.Replay) {
 			loadPlayback(slots[0]);
@@ -357,6 +352,8 @@ class Engine {
 	}
 
 	function onReset() {
+		resetLevelWithKeyR = false;	
+
 		// After the player resets a level, we want to skip the fade animation to frame zero of the level.
 		// So the pause callback is triggered several times with interval. The fade takes 20 frames.
 		// This function is called from the game code itself.
@@ -367,7 +364,6 @@ class Engine {
 			if (count >= resetLevelFrames) {
 				// Stop the loop
 				untyped clearInterval(advanceFrameInterval);
-				resetLevelFrames = 19;
 			}
 		}, frameLength);
 	}

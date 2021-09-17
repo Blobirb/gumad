@@ -14,7 +14,7 @@ class Main {
  |_____|_| |_|___/\\__\\__,_|_| |_|\\__|  \\_____\\___/|_| |_| \\___|\\___|");
 		trace("Instant Coffee is enabled.");
 		infoTrace("[r] to reset, and pause on the first frame of the level.");
-		infoTrace("[t] to reset, but pause one frame before the level begins. That way, you can pause the game on 'frame zero'.");
+		infoTrace("[t] to reset the level but without pausing the TAS tool, or breaking the recording. Use this if you want to record level resets.");
 		infoTrace("[a-s-d-f] to adjust playback speed.");
 		infoTrace("[z] to step frame.");
 		infoTrace("[0-9] to reset and play back video in the respective slot (used for save states).");

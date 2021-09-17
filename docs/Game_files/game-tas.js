@@ -7652,7 +7652,7 @@ var Game;
             _this.anchor.yAligned = Game.Y_BUTTONS_TOP;
             _this.arrows.yOffset = Game.Y_ARROWS_GAME_BUTTONS;
             _this.control.useKeyboard = true;
-            _this.control.keys = [Engine.Keyboard.R];
+            _this.control.keys = [Engine.Keyboard.R, Engine.Keyboard.T];
             return _this;
             //this.control.onPressedDelegate = this.onPressed;
         }

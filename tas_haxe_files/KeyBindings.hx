@@ -9,7 +9,6 @@ enum CoffeeInput {
     PlayFast;
 	Replay;
     Reset;
-    ResetShort;
     Slot(code: Int);
 }
 
@@ -23,7 +22,6 @@ class KeyBindings {
             case 70: return Some(PlayFast); // f
             case 13: return Some(Replay); // Enter
             case 82: return Some(Reset); // r
-            case 84: return Some(ResetShort); // t
             case _: {
                 if (code >= 48 && code <= 57) {
                     return Some(Slot(code - 48)); // 0-9

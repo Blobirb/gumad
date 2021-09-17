@@ -35,8 +35,10 @@
                     coffee._onScene(Game.Level.nextIndex);
                 });
                 Game.addAction("resetlevelbutton", function(){
-                    coffee._onScene(Game.Level.index);
-                    coffee._onReset();
+                    if (coffee.isLevelResetWithKeyR()){
+                        coffee._onScene(Game.Level.index);
+                        coffee._onReset();
+                    }
                 });
             });
         </script>
